@@ -1,5 +1,4 @@
-# template-relatorio
-template para relatórios de atividades
+# Atividade ATM
 
 ### Instituto Federal de Mato Grosso
 
@@ -22,7 +21,9 @@ Basta apertar em OK e seguir para os próximos passos
 
 # Configuração da rede ATM
 
-![topology](topology.png)
+![image](https://user-images.githubusercontent.com/91233884/229197414-4ca0caf3-d938-4a2b-ad02-9368a2f15951.png)
+
+
 
 
 :pushpin: para ligar os roteadores aos Switches, deve configurar as portas em **Slots**. No caso deste exercício, configurou-se o slot 1 com a opção: PA-A1. 
@@ -72,15 +73,15 @@ Já a configuração dos switches ATM é como segue:
 
 ### ATMSW1:
 
-![atm1.png](atm1.png)
+![image](https://user-images.githubusercontent.com/91233884/229197232-0e699cd4-708b-44ad-826b-44f551c0a87c.png)
 
 
 ### ATMSW2:
-![atm2.png](atm2.png)
+![image](https://user-images.githubusercontent.com/91233884/229197489-acb2c2ef-da3f-4d6a-bc5d-607f1589b71e.png)
 
 
 ### ATMSW3:
-![atm3.png](atm3.png)
+![image](https://user-images.githubusercontent.com/91233884/229197551-6dbaa790-ae2c-4e8c-b83a-e8834628fa6e.png)
 
 
 |Name|Port|VPI|VCI|Port|VPI|VCI|
