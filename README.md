@@ -19,53 +19,93 @@ Basta apertar em OK e seguir para os próximos passos
 
 
 
-# Configuração da rede ATM
+# Configuração da rede
 
-![image](https://user-images.githubusercontent.com/91233884/229197414-4ca0caf3-d938-4a2b-ad02-9368a2f15951.png)
-
-
+![image](https://user-images.githubusercontent.com/91233884/229901584-3f227ed3-7d62-4bbb-a62d-cc5845d9c1d5.png)
 
 
-:pushpin: para ligar os roteadores aos Switches, deve configurar as portas em **Slots**. No caso deste exercício, configurou-se o slot 1 com a opção: PA-A1. 
 
-:pushpin: As portas para conexão são as ATM
+
+:pushpin: para ligar os roteadores aos Switches, deve configurar as portas em **Slots**. Para os roteadores comunicando com Frame Relay, o slot 1 foi configurado com PA-4T+; Para comunicação ATM o slot 1 foi configurado com a opção: PA-A1.
+
 
 :pushpin: faça primeiro a configuração dos switches para permitir conexão com os roteadores. Para ligar aquela luz vermelha, basta apertar o play na barra de cima ou apertar com o botão direito no switch e selecionar **Start**
 
 
-As atividades consistem em configurar as interfaces dos roteadores R1 e R2 e os switches ATM ATMSWx. Primeiramente, as configurações dos roteadores é como segue:
+As atividades consistem em configurar as interfaces dos roteadores R1,R2 em comunicação Frame Relay e os roteadores R3 e R4 comunicando via ATM. Primeiramente, as configurações dos roteadores é como segue:
 
-:pushpin: Para poder colocar essas informações, aperte com o botão direito sobre o roteador e clique em **Console**
+##Para Frame Relay
+
+|Name|Port|DLCI|Port|DLCI|
+|-|-|-|-|-|-|-|
+|FRSW1|1|100|2|50|
+|FRSW1|1|101|3|150|
+|FRSW2|2|50|5|100|
+|FRSW2|5|101|3|150|
+|FRSW3|1|101|3|150|
 
 ### R1:
+```
+configure terminal
+interface Serial1/0
+ip address 10.0.0.1 255.255.255.0
+encapsulation frame-relay 
+frame-relay intf-type dte
+frame-relay map ip 10.0.0.2 100 broadcast
+no shutdown
+end
+```
+
+![image](https://user-images.githubusercontent.com/91233884/229901409-d59247c6-720a-4f07-98bd-9ee1bc7efb94.png)
+
+
+#### R2:
+```
+configure terminal
+interface Serial1/0
+ip address 10.0.0.2 255.255.255.0
+encapsulation frame-relay 
+frame-relay intf-type dte
+frame-relay map ip 10.0.0.1 100 broadcast
+no shutdown
+end
+```
+![image](https://user-images.githubusercontent.com/91233884/229901355-e99984c6-895c-4070-a7ac-233cdd7132fb.png)
+
+####CERTIFICANDO COMUNICAÇÃO
+
+
+
+
+## Para ATM
+
+### R3:
 ```
 configure terminal
 int atm1/0
 no shutdown
 int atm1/0.100 point-to-point
-ip address 10.10.10.1 255.255.255.252
+ip address 10.0.1.1 255.255.255.0
 pvc 100/101
 protocol ip 10.10.10.2 broadcast
 encapsulation aal5snap
 end
 ```
 
-![image](https://user-images.githubusercontent.com/91233884/228595044-13f9ba56-cdbe-4eb8-ae73-fa72a205d933.png)
 
 
-#### R2:
+#### R4:
 ```
 configure terminal
 int atm1/0
 no shutdown
 int atm1/0.100 point-to-point
-ip address 10.10.10.2 255.255.255.252
+ip address 10.0.1.2 255.255.255.0
 pvc 100/201
-protocol ip 10.10.10.1 broadcast
+protocol ip 10.0.1.1 broadcast
 encapsulation aal5snap
 end
 ```
-![image](https://user-images.githubusercontent.com/91233884/228595156-222f5599-8b88-4355-8114-5f06d3627386.png)
 
 Já a configuração dos switches ATM é como segue:
 
