@@ -1,0 +1,239 @@
+=~=~=~=~=~=~=~=~=~=~=~= PuTTY log 2023.05.05 12:30:29 =~=~=~=~=~=~=~=~=~=~=~=
+
+R1#
+R1#do    ping 4.4.4.4
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 4.4.4.4, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 20/28/32 ms
+R1#ping 4.4.4.4         192.168.1.4
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.1.4, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 28/35/52 ms
+R1#ping 192.168.1.4             1.1.1.1
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 1.1.1.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 4/4/4 ms
+R1#ping 1.1.1.1      0.0.0.1
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 10.0.0.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 4/4/4 ms
+R1#ping 10.0.0.1        4.4.4.4
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 4.4.4.4, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 28/36/60 ms
+R1#ping 4.4.4.4       192.168.1.4
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.1.4, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 28/34/52 ms
+R1#ping 192.168.1.4           10.0.0.2
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 10.0.0.2, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 28/36/56 ms
+R1#ping 10.0.0.2        2.2.2.2
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 2.2.2.2, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 28/34/56 ms
+R1#ping 2.2.2.2       3.33.  .3.3
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 3.3.3.3, timeout is 2 seconds:
+.....
+Success rate is 0 percent (0/5)
+R1#ping 3.3.3.3       192.168.0.3
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.0.3, timeout is 2 seconds:
+.....
+Success rate is 0 percent (0/5)
+R1#do ping         ping      dd  show ip route
+Codes: C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route
+
+Gateway of last resort is not set
+
+     1.0.0.0/32 is subnetted, 1 subnets
+C       1.1.1.1 is directly connected, Loopback0
+     2.0.0.0/32 is subnetted, 1 subnets
+B       2.2.2.2 [20/0] via 10.0.0.2, 00:52:14
+     3.0.0.0/32 is subnetted, 1 subnets
+B       3.3.3.3 [20/2] via 10.0.0.2, 00:52:14
+     4.0.0.0/32 is subnetted, 1 subnets
+O       4.4.4.4 [110/2] via 192.168.1.4, 00:52:29, GigabitEthernet0/0
+     10.0.0.0/24 is subnetted, 1 subnets
+C       10.0.0.0 is directly connected, GigabitEthernet1/0
+B    192.168.0.0/24 [20/0] via 10.0.0.2, 00:52:14
+C    192.168.1.0/24 is directly connected, GigabitEthernet0/0
+R1#show ip rout         running
+Building configuration...
+
+Current configuration : 1568 bytes
+!
+upgrade fpd auto
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+logging message-counter syslog
+!
+no aaa new-model
+ip source-route
+no ip icmp rate-limit unreachable
+ip cef
+!
+!
+!
+ --More--         !
+ --More--         no ip domain lookup
+ --More--         no ipv6 cef
+ --More--         !
+ --More--         multilink bundle-name authenticated
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         archive
+ --More--          log config
+ --More--           hidekeys
+ --More--         ! 
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         ip tcp synwait-time 5
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         interface Loopback0
+ --More--          ip address 1.1.1.1 255.255.255.255
+ --More--          ip ospf 1 area 2
+ --More--         !
+ --More--         interface Ethernet0/0
+ --More--          no ip address
+ --More--          shutdown
+ --More--          duplex auto
+ --More--         !
+ --More--         interface GigabitEthernet0/0
+ --More--          ip address 192.168.1.1 255.255.255.0
+ --More--          ip ospf 1 area 2
+ --More--          duplex full
+ --More--          speed 1000
+ --More--          media-type gbic
+ --More--          negotiation auto
+ --More--         !
+ --More--         interface GigabitEthernet1/0
+ --More--          ip address 10.0.0.1 255.255.255.0
+ --More--          negotiation auto
+ --More--         !
+ --More--         router ospf 1
+ --More--          log-adjacency-changes
+ --More--          redistribute bgp 65002 subnets
+ --More--         !
+ --More--         router bgp 65002
+ --More--          bgp log-neighbor-changes
+ --More--          neighbor 10.0.0.2 remote-as 65001
+ --More--          !
+ --More--          address-family ipv4
+ --More--           neighbor 10.0.0.2 activate
+ --More--           no auto-summary
+ --More--           no synchronization
+ --More--           network 1.1.1.1 mask 255.255.255.255
+ --More--           network 4.4.4.4 mask 255.255.255.255
+ --More--           network 192.168.1.0
+ --More--          exit-address-family
+ --More--         !
+ --More--         ip forward-protocol nd
+ --More--         no ip http server
+ --More--         no ip http secure-server
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         no cdp log mismatch duplex
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         control-plane
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         !
+ --More--         gatekeeper
+ --More--          shutdown
+ --More--         !
+ --More--         !
+ --More--         line con 0
+ --More--          exec-timeout 0 0
+ --More--          privilege level 15
+ --More--          logging synchronous
+ --More--          stopbits 1
+ --More--         line aux 0
+ --More--          exec-timeout 0 0
+ --More--          privilege level 15
+ --More--          logging synchronous
+ --More--          stopbits 1
+ --More--         line vty 0 4
+ --More--          login
+ --More--         !
+ --More--         end
+ --More--         
+R1#
+R1#
+R1#
+R1#
+R1#
+R1#
+R1#
+R1#
+R1#
+R1#
+R1#
+R1#
+R1#wr mem
+Building configuration...
+[OK]
+R1#
