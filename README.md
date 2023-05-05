@@ -770,7 +770,7 @@ do show int br
 ```
 conf term
 int g3/0
-ip address 10.0.3.3 255.255.255.255
+ip address 10.0.3.3 255.255.255.0
 ip ospf 1 area 0
 no shut 
 do show int br
@@ -780,7 +780,7 @@ do show int br
 ```
 conf term
 int g2/0
-ip address 10.0.4.4 255.255.255.255
+ip address 10.0.4.4 255.255.255.0
 ip ospf 1 area 0
 no shut 
 do show int br
