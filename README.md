@@ -212,7 +212,7 @@ ip ospf 2 area 2
 ```
 
 A partir daqui,  a interface g0/0 já está rodando OSPF na área 2 e na VRF CA
-- “do sh ip route vrf CA” -  para confirmar que aparece a rede 1 como conhecida na VRF CA especificada ( pode demorar um pouco para aparecer)
+- “do sh ip route vrf CA” -  para confirmar se aparece a outra rede como conhecida na VRF CA especificada ( pode demorar um pouco para aparecer)
 
 ![image](https://user-images.githubusercontent.com/91233884/236468916-3938bc27-9a44-450c-97b0-32094c8eaf05.png)
 * um pequeno bug na linha do terminal, mas considere ultimo comando, aquele que foi anunciado anteriomente para confirmar as redes na VRF CA
@@ -265,19 +265,19 @@ no shut
 ip ospf 2 area 2
 ```
 
-A partir daqui,  a interface g0/0 já está rodando OSPF na área 2 e na VRF CA
-- “do sh ip route vrf CA” -  para confirmar que aparece a rede 1 como conhecida na VRF CA especificada ( pode demorar um pouco para aparecer)
+A partir daqui,  a interface g1/0 já está rodando OSPF na área 2 e na VRF CA
+- “do sh ip route vrf CA” -   para confirmar se aparece a outra rede como conhecida na VRF CA especificada ( pode demorar um pouco para aparecer)
 
 ![image](https://user-images.githubusercontent.com/91233884/236468437-a50dac02-3d84-4df0-87e6-529b445da36b.png)
 
 
-# REDISTRIBUIÇÃO DE ROTAS
+# REDISTRIBUIÇÃO DE ROTAS CLIENT A
 
 Como R1 e R7 estão rodando a mesma rede, eles devem se comunicar. Porém no momento ainda não é possível, pois não se tem rotas conhecidas. Para que isso seja possivel , é necessário realizar uma redistribuição de rotas OSPF(redes externas)-BGP(core) e vice-versa
 
 - Realizada apenas em roteadores de borda
 
-R3
+### R3
 ```
 router bgp 65001
 redistribute ospf 1
@@ -287,15 +287,193 @@ redistribute ospf 2
 
 ```
 
+- do show running-config | section bgp - gera uma saida nesse sentido aqui se tiver dado certo
+
+![image](https://user-images.githubusercontent.com/91233884/236496516-ce390ce1-73bd-42a7-8219-6a2aaa4903cc.png)
+
+### R5
+```
+router ospf 1
+redistribute bgp 65001 subnets 
+router bgp 65001
+address-family ipv4 unicast vrf CA
+redistribute ospf 1
+redistribute ospf 2
+
+```
+### R3
+```
+router ospf 2
+redistribute bgp 65001 subnets
+exit
+
+```
+
+### R5
+```
+router ospf 2
+redistribute bgp 65001 subnets
+exit
+
+```
+
+- Agora é para funcionar o ping de R7 - R1 via loopback e via loopback e vice-versa
+
+![image](https://user-images.githubusercontent.com/91233884/236497727-0872a6bc-a44f-44e9-8bc1-79184a89f220.png)
+
+obs: novamente o arquivo de log deu uma bugada, mas na primeira linha de comando considere o ultimo comando "do ping 1.1.1.1" como válido
+
+
+# CONFIGURANDO VRF OSPF 1 AREA 3 - R2
+
+### R2:
+```
+conf term 
+int lo0
+ip address 2.2.2.2 255.255.255.255
+ip ospf 1 area 3
+no shut 
+int g0/0
+ip address 172.16.1.2 255.255.255.0
+ip ospf 1 area 3
+no shut 
+
+```
+- "do show ip int br" - a interface g0/0 e a loopback deve estar Up
+
+
+## CONFIGURANDO ROTEADOR DE BORDA R3
+Com a finalidade de especificar a interface que tem que propagar os pacotes para a VRF em especifico
+
+```
+int g0/0
+ip address 172.16.1.3 255.255.255.0
+no shut
+
+```
+  - Criação de uma VRF
+  observação: tem que ser outro parâmetro de CA
+```
+ip vrf CB
+rd 3:3
+route-target both 3:3
+```
+
+- Ativando essa VRF dentro da interface
+
+```
+int g0/0
+ip vrf forwarding CB
+int g0/0 
+ip address 172.16.1.3 255.255.255.0
+no shut 
+ip ospf 3 area 3
+```
+
+A partir daqui,  a interface g0/0 já está rodando OSPF na área 3 e na VRF CB
+- “do sh ip route vrf CB” -   para confirmar se aparece a outra rede como conhecida na VRF CB especificada ( pode demorar um pouco para aparecer)
+
+
+# CONFIGURANDO VRF OSPF 1 AREA 3 - R8
+
+### R8:
+```
+conf term 
+int lo0
+ip address 8.8.8.8 255.255.255.255
+ip ospf 1 area 3
+no shut 
+int g0/0
+ip address 172.16.2.8 255.255.255.0
+ip ospf 1 area 3 
+no shut 
+
+```
+- "do show ip int br" - a interface g0/0 e a loopback deve estar Up
+
+
+## CONFIGURANDO ROTEADOR DE BORDA R4
+Com a finalidade de especificar a interface que tem que propagar os pacotes para a VRF em especifico
+
+```
+int g1/0
+ip address 172.16.2.4 255.255.255.0
+no shut 
+
+```
+  - Criação de uma VRF
+  observação: tem que ter os mesmos paramêtros colocados anteriormente em CB
+```
+ip vrf CB
+rd 3:3
+route-target both 3:3
+```
+
+- Ativando essa VRF dentro da interface
+
+```
+int g1/0
+ip vrf forwarding CB
+int g1/0 
+ip address 172.16.2.4 255.255.255.0
+ip ospf 3 area 3
+no shut
+```
+
+A partir daqui,  a interface g0/0 já está rodando OSPF na área 3 e na VRF CB
+- “do sh ip route vrf CB” -  para confirmar se aparece a outra rede como conhecida na VRF CB especificada ( pode demorar um pouco para aparecer)
 
 
 
+# REDISTRIBUIÇÃO DE ROTAS CLIENT B
 
+Como R2 e R8 estão rodando a mesma rede, eles devem se comunicar. Porém no momento ainda não é possível, pois não se tem rotas conhecidas. Para que isso seja possivel , é necessário realizar uma redistribuição de rotas OSPF(redes externas)-BGP(core) e vice-versa
 
+- Realizada apenas em roteadores de borda
 
+### R3
+```
+router bgp 65001
+redistribute ospf 1
+redistribute ospf 3
+address-family ipv4 unicast vrf CB
+redistribute ospf 3
 
+```
 
+- do show running-config | section bgp - gera uma saida nesse sentido aqui se tiver dado certo
 
+![image](https://user-images.githubusercontent.com/91233884/236501290-bb70c959-c36a-4342-b651-8b5d8c69696c.png)
+
+### R4
+```
+router ospf 1
+redistribute bgp 65001 subnets 
+router bgp 65001
+address-family ipv4 unicast vrf CB
+redistribute ospf 1
+redistribute ospf 3
+
+```
+### R3
+```
+router ospf 3
+redistribute bgp 65001 subnets
+exit
+
+```
+
+### R4
+```
+router ospf 3
+redistribute bgp 65001 subnets
+exit
+
+```
+
+- Agora é para funcionar o ping de R2 - R8 via loopback e via loopback e vice-versa
+
+![image](https://user-images.githubusercontent.com/91233884/236501670-a9f72ac3-6609-47b8-87bf-fef938082361.png)
 
 
 
