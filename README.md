@@ -161,7 +161,7 @@ exit
 ### R2:
 ```
 int g1/0
-ip address 10.0.0.2 255.255.255.0
+ip address 10.0.0.2 255.0.0.0
 no shut
 exit
 router bgp 65001
@@ -179,7 +179,7 @@ exit
 ### R1:
 ```
 int g1/0
-ip address 10.0.0.1 255.255.255.0
+ip address 10.0.0.1 255.0.0.0
 no shut
 exit
 router bgp 65002
@@ -198,6 +198,50 @@ exit
 
 - Aqui ainda não é possivel comunicar com roteadores de outros sistemas autonomos 
 
+
+- Abaixo realizou-se a configuração para que a comunicação via loopback funcione também
+
+
+
+### R1:
+```
+router bgp 65002
+network 4.4.4.4 mask 255.255.255.255
+network 1.1.1.1 mask 255.255.255.255
+network 10.0.0.0 mask 255.0.0.0.0
+exit
+
+```
+### R4:
+```
+router bgp 65002
+network 4.4.4.4 mask 255.255.255.255
+network 1.1.1.1 mask 255.255.255.255
+network 10.0.0.0 mask 255.0.0.0.0
+exit
+
+```
+
+### R2:
+```
+router bgp 65001
+network 3.3.3.3 mask 255.255.255.255
+network 2.2.2.2 mask 255.255.255.255
+network 10.0.0.0 mask 255.0.0.0.0
+exit
+
+
+```
+### R3:
+```
+router bgp 65001
+network 3.3.3.3 mask 255.255.255.255
+network 2.2.2.2 mask 255.255.255.255
+network 10.0.0.0 mask 255.0.0.0.0
+exit
+
+
+```
 ### R2:
 ```
 router ospf 1 
@@ -210,31 +254,6 @@ end
 router ospf 1 
 redistribute bgp 65002 subnets 
 end 
-
-```
-
-- “do show ip route” - É esperado que R3 veja o roteador R1 ou a rede que interliga R1/R3
-- mas agora só é possivel pingar de R4 para R2 via interface fisica. 
-- Abaixo realizou-se a configuração para que a comunicação via loopback funcione também
-
-
-
-### R1:
-```
-router bgp 65002
-network 4.4.4.4 mask 255.255.255.255
-network 1.1.1.1 mask 255.255.255.255
-exit
-
-```
-
-### R2:
-```
-router bgp 65001
-network 3.3.3.3 mask 255.255.255.255
-network 2.2.2.2 mask 255.255.255.255
-exit
-
 
 ```
 
@@ -254,8 +273,6 @@ exit
 Para mais testes de conexão em outros roteadores e verificação de coonfigurações, consulte os arquivos .txt com inicio Q1 neste repositório. 
 
 
-
-show running
 
 
 ---
