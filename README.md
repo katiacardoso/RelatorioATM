@@ -6,15 +6,280 @@ Estudante: Katia Lorena Cardoso Sena -
 Matrícula: 2019178440088
 
 Curso: Engenharia da Computação - Disciplina: Redes de Computadores II
+---
+
+# -------------------------------------------------------------  Questão 1   --------------------------------------------------------------
+
+---
+
+# TOPOLOGIA 
+
+![image](https://user-images.githubusercontent.com/91233884/236506230-9de6f3aa-ec87-4abc-9af0-2dbd67c264f1.png)
+
+- para ligar os roteadores aos Switches, deve configurar as portas em **Slots**. No caso deste exercício, configurou-se os slots com o final "GE". 
+
+-  faça primeiro a configuração dos switches para permitir conexão com os roteadores. Para ligar aquela luz vermelha, basta apertar o play na barra de cima ou apertar com o botão direito no switch e selecionar **Start**
+
+# CONFIGURAÇÕES UTILIZANDO O GNS3
+
+## CONFIGURAÇÃO DAS INTERFACES
+
+### R3:
+```
+conf term
+int lo0
+ip address 3.3.3.3 255.255.255.255
+no shut 
+exit
+int g0/0
+ip address 192.168.0.3 255.255.255.0
+no shut
+exit
+
+```
+
+
+### R2:
+```
+conf term
+int lo0
+ip address 2.2.2.2 255.255.255.255
+no shut 
+exit
+int g1/0
+ip address 10.0.0.2 255.0.0.0
+no shut
+exit
+int g0/0
+ip address 192.168.0.2 255.255.255.0
+no shut
+exit
+
+```
+
+### R1:
+```
+conf term
+int lo0
+ip address 1.1.1.1 255.255.255.255
+no shut 
+exit
+int g0/0
+ip address 192.168.1.1 255.255.255.0
+no shut
+exit
+int g1/0
+ip address 10.0.0.1 255.0.0.0
+no shut
+exit
+
+```
+
+
+### R4:
+```
+conf term
+int lo0
+ip address 4.4.4.4 255.255.255.255
+no shut 
+exit
+int g0/0
+ip address 192.168.1.4 255.255.255.0
+no shut
+exit
+```
+
+
+- “ do show ip int br” - para checar se a configuração das interfaces está correta
+
+![image](https://user-images.githubusercontent.com/91233884/236508283-2daa13e1-edfc-42b5-81f5-862d51fa21f8.png)
+
+
+
+## CONFIGURAÇÃO DO OSPF
+
+### R3:
+```
+int lo0
+ip ospf 1 area 1
+no shut
+exit
+int g0/0
+ip ospf 1 area 1 
+no shut 
+exit 
+
+```
+
+### R2:
+```
+int lo0
+ip ospf 1 area 1
+no shut
+exit
+int g0/0
+ip ospf 1 area 1 
+no shut 
+exit 
+```
+
+### R1:
+```
+int lo0
+ip ospf 1 area 2
+no shut
+exit
+int g0/0
+ip ospf 1 area 2
+no shut 
+exit 
+
+```
+
+### R4:
+```
+int lo0
+ip ospf 1 area 2
+no shut
+exit
+int g0/0
+ip ospf 1 area 2 
+no shut 
+exit 
+
+
+```
+
+- agora deve ser possível pingar dentro da mesma área via endereço loopback
+
+![image](https://user-images.githubusercontent.com/91233884/236510080-e62b3dab-c688-4d13-af0f-c360e5ca9e02.png)
+
+## CONFIGURAÇÃO DO BGP
+
+- Aqui utiliza aquele AS (Automatus system) para identificar o bgp
+
+### R2:
+```
+int g1/0
+ip address 10.0.0.2 255.255.255.0
+no shut
+exit
+router bgp 65001
+network 192.168.0.0 mask 255.255.255.0
+no auto-summary
+address-family ipv4
+exit
+neighbor 10.0.0.1 remote-as 65002
+address-family ipv4
+neighbor 10.0.0.1 activate
+exit
+
+```
+
+### R1:
+```
+int g1/0
+ip address 10.0.0.1 255.255.255.0
+no shut
+exit
+router bgp 65002
+network 192.168.1.0 mask 255.255.255.0
+no auto-summary
+address-family ipv4
+exit
+neighbor 10.0.0.2 remote-as 65001
+address-family ipv4
+neighbor 10.0.0.2 activate
+exit
+
+```
+
+## REDISTRIBUICÃO DE IP'S INTERNOS
+
+- Aqui ainda não é possivel comunicar com roteadores de outros sistemas autonomos 
+
+### R2:
+```
+router ospf 1 
+redistribute bgp 65001 subnets 
+end 
+
+```
+### R1:
+```
+router ospf 1 
+redistribute bgp 65002 subnets 
+end 
+
+```
+
+- “do show ip route” - É esperado que R3 veja o roteador R1 ou a rede que interliga R1/R3
+- mas agora só é possivel pingar de R4 para R2 via interface fisica. 
+- Abaixo realizou-se a configuração para que a comunicação via loopback funcione também
+
+
+
+### R1:
+```
+router bgp 65002
+network 4.4.4.4 mask 255.255.255.255
+network 1.1.1.1 mask 255.255.255.255
+exit
+
+```
+
+### R2:
+```
+router bgp 65001
+network 3.3.3.3 mask 255.255.255.255
+network 2.2.2.2 mask 255.255.255.255
+exit
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+# -------------------------------------------------------------  Questão 2   --------------------------------------------------------------
 
 ---
 
 
-
-# TOPOLOGIA
+# TOPOLOGIA 
 
 ![image](https://user-images.githubusercontent.com/91233884/236461502-ba953e8f-e9a6-40ce-b5b5-1835ab1dc574.png)
-
 
 
 
