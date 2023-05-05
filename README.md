@@ -1,4 +1,4 @@
-# Atividade ATM
+# PROVA 2
 
 ### Instituto Federal de Mato Grosso
 
@@ -8,80 +8,303 @@ Matrícula: 2019178440088
 Curso: Engenharia da Computação - Disciplina: Redes de Computadores II
 
 ---
-# Inserção da imagem do roteador Cisco 7200 
-
-
-Para inserir a imagem do roteador, siga este caminho: Edit -> Preferences -> IOS routers na barra lateral esquerda -> New -> Selecione a imagem, em formato .iso -> vai apertando next até chegar nesta tela:
-
-![image](https://user-images.githubusercontent.com/91233884/228563399-7ea17f2e-0851-4202-9eb4-6dbe3f0cf17f.png)
-
-Basta apertar em OK e seguir para os próximos passos
 
 
 
-# Configuração da rede ATM
+# TOPOLOGIA
 
-![image](https://user-images.githubusercontent.com/91233884/229197414-4ca0caf3-d938-4a2b-ad02-9368a2f15951.png)
+![image](https://user-images.githubusercontent.com/91233884/236461502-ba953e8f-e9a6-40ce-b5b5-1835ab1dc574.png)
 
 
 
 
-:pushpin: para ligar os roteadores aos Switches, deve configurar as portas em **Slots**. No caso deste exercício, configurou-se o slot 1 com a opção: PA-A1. 
 
-:pushpin: As portas para conexão são as ATM
+- para ligar os roteadores aos Switches, deve configurar as portas em **Slots**. No caso deste exercício, configurou-se os slots com o final "GE". 
 
-:pushpin: faça primeiro a configuração dos switches para permitir conexão com os roteadores. Para ligar aquela luz vermelha, basta apertar o play na barra de cima ou apertar com o botão direito no switch e selecionar **Start**
+-  faça primeiro a configuração dos switches para permitir conexão com os roteadores. Para ligar aquela luz vermelha, basta apertar o play na barra de cima ou apertar com o botão direito no switch e selecionar **Start**
 
 
-As atividades consistem em configurar as interfaces dos roteadores R1 e R2 e os switches ATM ATMSWx. Primeiramente, as configurações dos roteadores é como segue:
 
-:pushpin: Para poder colocar essas informações, aperte com o botão direito sobre o roteador e clique em **Console**
+# CONFIGURAÇÕES UTILIZANDO O GNS3
+
+
+
+- Para poder colocar essas informações, aperte com o botão direito sobre o roteador e clique em **Console**
+
+## CONFIGURAÇÃO INICIAL DO NÚCLEO MPLS R3,R4,R5 E R6
+
+### R3:
+```
+conf term
+int lo0
+ip address 3.3.3.3  255.255.255.255
+ip ospf 1 area 0
+no shut 
+int g2/0
+ip address 10.0.1.3 255.255.255.0
+ip ospf 1 area 0
+no shut 
+```
+
+### R4:
+```
+conf term
+int lo0
+ip address 4.4.4.4  255.255.255.255
+ip ospf 1 area 0
+no shut 
+int g0/0
+ip address 10.0.2.4 255.255.255.0
+ip ospf 1 area 0
+no shut 
+```
+
+### R6:
+```
+conf term
+int lo0
+ip address 6.6.6.6  255.255.255.255
+ip ospf 1 area 0
+no shut 
+int g0/0
+ip address 10.0.1.6 255.255.255.0
+ip ospf 1 area 0
+no shut 
+int g1/0
+ip address 10.0.2.6 255.255.255.0
+ip ospf 1 area 0
+no shut 
+int g2/0
+ip address 10.0.3.6 255.255.255.0
+ip ospf 1 area 0
+no shut 
+
+```
+### R5:
+```
+conf term
+int lo0
+ip address 5.5.5.5  255.255.255.255
+ip ospf 1 area 0
+no shut 
+int g0/0
+ip address 10.0.3.5 255.255.255.0
+ip ospf 1 area 0
+no shut 
+
+
+```
+
+- Faça o “do show ip int br” para verificar se as interfaces estão com is IP corretos 
+- É possível de realizar o comando “Do ping + (ip de outro roteador que está nesta área)” para testar conectividade entre interfaces
+
+![image](https://user-images.githubusercontent.com/91233884/236463178-c3ddd276-5723-4240-9d54-b3282106c7c9.png)
+
+
+## ATIVAÇÃO DO MPLS NOS ROTEADORES DO NUCLEO
+- Executar o comadno abaixo para R3, R6, R3 e R4
+
+```
+router ospf 1
+mpls ldp autoconfig
+
+```
+- Após o comando, deve aparecer uma mensagem similar a esta. Na imagem abaixo, é possivel visualizar a mensagem referente ao R6, roteador que tem mais vizinhos nesta topologia
+![image](https://user-images.githubusercontent.com/91233884/236464034-a0be2e3e-2721-4476-b1eb-45d4cc478f37.png)
+
+
+
+## PAREAMENTO BGP ENTRE OS ROTEADORES DE BORDA R3, R4 e R5
+
+-  o 65001 é o número do sistema autômato ( AS)
+
+### R3:
+```
+router bgp 65001 
+neighbor 4.4.4.4 remote-as 65001
+neighbor 5.5.5.5 remote-as 65001
+neighbor 4.4.4.4 update-source Loopback 0
+neighbor 5.5.5.5 update-source Loopback 0
+no auto-summary
+address-family vpnv4 unicast
+neighbor 4.4.4.4 activate
+neighbor 5.5.5.5 activate
+exit
+```
+
+### R4:
+```
+router bgp 65001 
+neighbor 3.3.3.3 remote-as 65001
+neighbor 5.5.5.5 remote-as 65001
+neighbor 3.3.3.3 update-source Loopback 0
+neighbor 5.5.5.5 update-source Loopback 0
+no auto-summary
+address-family vpnv4 unicast
+neighbor 3.3.3.3 activate
+neighbor 5.5.5.5 activate
+exit
+```
+
+### R5:
+```
+router bgp 65001 
+neighbor 3.3.3.3 remote-as 65001
+neighbor 4.4.4.4 remote-as 65001
+neighbor 3.3.3.3 update-source Loopback 0
+neighbor 4.4.4.4 update-source Loopback 0
+no auto-summary
+address-family vpnv4 unicast
+neighbor 3.3.3.3 activate
+neighbor 4.4.4.4 activate
+exit
+```
+
+- para verificar se deu certo pode digitar “do show ip bgp neighbors” ou verifique a mensagem que apareceu em seguida.
+- Nesta amostra do R5, é possível notar que após a conifguração do MPLs seu único vizinho era R6. Contudo, ao realizar as configurações do BGP, R4 e R3 se tornaram vizinhos também
+
+![image](https://user-images.githubusercontent.com/91233884/236464899-6f18838e-40aa-4ad3-899a-ecaf5ded48db.png)
+
+
+# CONFIGURANDO VRF OSPF 1 AREA 2 - R1
 
 ### R1:
 ```
-configure terminal
-int atm1/0
-no shutdown
-int atm1/0.100 point-to-point
-ip address 10.10.10.1 255.255.255.252
-pvc 100/101
-protocol ip 10.10.10.2 broadcast
-encapsulation aal5snap
-end
+conf term 
+int lo0
+ip address 1.1.1.1 255.255.255.255
+ip ospf 1 area 2
+no shut 
+int g0/0
+ip address 192.168.1.1 255.255.255.0
+ip ospf 1 area 2
+no shut 
+
+```
+- "do show ip int br" - a interface g0/0 e a loopback deve estar Up
+
+
+## CONFIGURANDO ROTEADOR DE BORDA R3
+Com a finalidade de especificar a interface que tem que propagar os pacotes para a VRF em especifico
+
+```
+int g1/0
+ip address 192.168.1.3 255.255.255.0
+no shut 
+```
+  - Criação de uma VRF
+```
+ip vrf CA
+rd 4:4
+route-target both 4:4
+
 ```
 
-![image](https://user-images.githubusercontent.com/91233884/228595044-13f9ba56-cdbe-4eb8-ae73-fa72a205d933.png)
+- Ativando essa VRF dentro da interface
 
-
-#### R2:
 ```
-configure terminal
-int atm1/0
-no shutdown
-int atm1/0.100 point-to-point
-ip address 10.10.10.2 255.255.255.252
-pvc 100/201
-protocol ip 10.10.10.1 broadcast
-encapsulation aal5snap
-end
+int g1/0
+ip vrf forwarding CA
+int g1/0 
+ip address 192.168.1.3 255.255.255.0
+no shut 
+ip ospf 2 area 2
 ```
-![image](https://user-images.githubusercontent.com/91233884/228595156-222f5599-8b88-4355-8114-5f06d3627386.png)
 
-Já a configuração dos switches ATM é como segue:
+A partir daqui,  a interface g0/0 já está rodando OSPF na área 2 e na VRF CA
+- “do sh ip route vrf CA” -  para confirmar que aparece a rede 1 como conhecida na VRF CA especificada ( pode demorar um pouco para aparecer)
 
-:pushpin: Atenção a posição de cada switch
-
-### ATMSW1:
-
-![image](https://user-images.githubusercontent.com/91233884/229197232-0e699cd4-708b-44ad-826b-44f551c0a87c.png)
+![image](https://user-images.githubusercontent.com/91233884/236468916-3938bc27-9a44-450c-97b0-32094c8eaf05.png)
+* um pequeno bug na linha do terminal, mas considere ultimo comando, aquele que foi anunciado anteriomente para confirmar as redes na VRF CA
 
 
-### ATMSW2:
-![image](https://user-images.githubusercontent.com/91233884/229197489-acb2c2ef-da3f-4d6a-bc5d-607f1589b71e.png)
+
+# CONFIGURANDO VRF OSPF 1 AREA 2 - R7
+
+### R7:
+```
+conf term 
+int lo0
+ip address 7.7.7.7 255.255.255.255
+ip ospf 1 area 2
+no shut 
+int g0/0
+ip address 192.168.2.7 255.255.255.0
+ip ospf 1 area 2 
+no shut 
+```
+- "do show ip int br" - a interface g0/0 e a loopback deve estar Up
 
 
-### ATMSW3:
-![image](https://user-images.githubusercontent.com/91233884/229197551-6dbaa790-ae2c-4e8c-b83a-e8834628fa6e.png)
+## CONFIGURANDO ROTEADOR DE BORDA R5
+Com a finalidade de especificar a interface que tem que propagar os pacotes para a VRF em especifico
+
+```
+int g1/0
+ip address 192.168.2.5 255.255.255.0
+no shut 
+
+```
+  - Criação de uma VRF
+  observação: tem que ter os mesmos paramêtros colocados anteriormente
+```
+ip vrf CA
+rd 4:4
+route-target both 4:4
+
+```
+
+- Ativando essa VRF dentro da interface
+
+```
+int g1/0
+ip vrf forwarding CA
+int g1/0 
+ip address 192.168.2.5 255.255.255.0
+no shut 
+ip ospf 2 area 2
+```
+
+A partir daqui,  a interface g0/0 já está rodando OSPF na área 2 e na VRF CA
+- “do sh ip route vrf CA” -  para confirmar que aparece a rede 1 como conhecida na VRF CA especificada ( pode demorar um pouco para aparecer)
+
+![image](https://user-images.githubusercontent.com/91233884/236468437-a50dac02-3d84-4df0-87e6-529b445da36b.png)
+
+
+# REDISTRIBUIÇÃO DE ROTAS
+
+Como R1 e R7 estão rodando a mesma rede, eles devem se comunicar. Porém no momento ainda não é possível, pois não se tem rotas conhecidas. Para que isso seja possivel , é necessário realizar uma redistribuição de rotas OSPF(redes externas)-BGP(core) e vice-versa
+
+- Realizada apenas em roteadores de borda
+
+R3
+```
+router bgp 65001
+redistribute ospf 1
+redistribute ospf 2
+address-family ipv4 unicast vrf CA
+redistribute ospf 2
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 |Name|Port|VPI|VCI|Port|VPI|VCI|
@@ -90,10 +313,3 @@ Já a configuração dos switches ATM é como segue:
 |ATMSW2|2|100|150|3|100|50|
 |ATMSW3|3|100|50|1|100|201|
 
-
-Para testar se está funcionando, basta realizar o comando ping entre as redes, como abaixo:
-### R1:
-![image](https://user-images.githubusercontent.com/91233884/228596642-2ea27c28-4920-436b-9149-8a1cdd4f84f7.png)
-
-### R2:
-![image](https://user-images.githubusercontent.com/91233884/228596367-91dd7d57-535a-4a84-9276-09be3371167d.png)
