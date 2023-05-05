@@ -298,7 +298,6 @@ Para mais testes de conexão em outros roteadores e verificação de coonfigura�
 # CONFIGURAÇÕES UTILIZANDO O GNS3
 
 
-
 - Para poder colocar essas informações, aperte com o botão direito sobre o roteador e clique em **Console**
 
 ## CONFIGURAÇÃO INICIAL DO NÚCLEO MPLS R3,R4,R5 E R6
@@ -746,7 +745,17 @@ exit
 ![image](https://user-images.githubusercontent.com/91233884/236501670-a9f72ac3-6609-47b8-87bf-fef938082361.png)
 
 
+# -------------------------------------------------------------  Questão 2   --------------------------------------------------------------
 
+
+# TOPOLOGIA 
+
+![image](https://user-images.githubusercontent.com/91233884/236554572-d7ef0cbb-79eb-4f36-b9e9-70d07573b978.png)
+
+
+# CONFIGURAÇÃO NO GNS3
+
+## CONFIGURAÇÕES INICIAIS
 
 ### R9:
 ```
@@ -773,7 +782,7 @@ int g3/0
 ip address 10.0.3.3 255.255.255.0
 ip ospf 1 area 0
 no shut 
-do show int br
+do show ip int br
 ```
 
 ### R4:
@@ -783,7 +792,7 @@ int g2/0
 ip address 10.0.4.4 255.255.255.0
 ip ospf 1 area 0
 no shut 
-do show int br
+do show ip int br
 ```
 
 ## ATIVAÇÃO DO MPLS NOS ROTEADORES DO NUCLEO
@@ -794,14 +803,12 @@ router ospf 1
 mpls ldp autoconfig
 
 ```
+## ROTAS CONHECIDAS DE R9
 
+![image](https://user-images.githubusercontent.com/91233884/236555897-22d5e5af-fba5-4991-8cf3-638ff733796d.png)
 
+- DEMONSTRAÇÃO DA UTILIZAÇÃO DE ROTA PASSANDO PELO R9
 
+![image](https://user-images.githubusercontent.com/91233884/236556640-6287c617-8f98-4878-88b0-e60751259fca.png)
 
-
-|Name|Port|VPI|VCI|Port|VPI|VCI|
-|-|-|-|-|-|-|-|
-|ATMSW1|1|100|101|3|100|150|
-|ATMSW2|2|100|150|3|100|50|
-|ATMSW3|3|100|50|1|100|201|
 
