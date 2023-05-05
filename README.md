@@ -239,35 +239,23 @@ exit
 ```
 
 
+## TESTANDO CONEXÃO
+
+- Rotas que são conhecidas pelo roteador 
+
+![image](https://user-images.githubusercontent.com/91233884/236517559-fc2e9d17-b18e-4ecf-bc8c-52751d926f22.png)
+
+
+- Teste de conexão entre pontas
+
+![image](https://user-images.githubusercontent.com/91233884/236518180-d89f0278-3b37-4fae-a79d-542a84ae2ed5.png)
+
+
+Para mais testes de conexão em outros roteadores e verificação de coonfigurações, consulte os arquivos .txt com inicio Q1 neste repositório. 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+show running
 
 
 ---
