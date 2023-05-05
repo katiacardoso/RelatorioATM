@@ -372,7 +372,7 @@ no shut
 
 
 ## ATIVAÇÃO DO MPLS NOS ROTEADORES DO NUCLEO
-- Executar o comadno abaixo para R3, R6, R3 e R4
+- Executar o comando abaixo para R3, R6, R3 e R4
 
 ```
 router ospf 1
@@ -748,8 +748,52 @@ exit
 
 
 
+### R9:
+```
+conf term
+int lo0
+ip address 9.9.9.9  255.255.255.255
+ip ospf 1 area 0
+no shut 
+int g0/0
+ip address 10.0.3.9 255.255.255.0
+ip ospf 1 area 0
+no shut 
+int g1/0
+ip address 10.0.4.9 255.255.255.0
+ip ospf 1 area 0
+no shut 
+do show int br
+```
 
+### R3:
+```
+conf term
+int g3/0
+ip address 10.0.3.3 255.255.255.255
+ip ospf 1 area 0
+no shut 
+do show int br
+```
 
+### R4:
+```
+conf term
+int g2/0
+ip address 10.0.4.4 255.255.255.255
+ip ospf 1 area 0
+no shut 
+do show int br
+```
+
+## ATIVAÇÃO DO MPLS NOS ROTEADORES DO NUCLEO
+
+### R9
+```
+router ospf 1
+mpls ldp autoconfig
+
+```
 
 
 
